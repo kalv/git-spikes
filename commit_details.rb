@@ -1,4 +1,5 @@
 require 'virtus'
+require 'byebug'
 
 # Helper class to help parse out information of the commit log line
 class CommitDetails
@@ -18,7 +19,13 @@ class CommitDetails
   end
 
   def details
-    sections[1, -1].join("\n")
+    commit_messages.map {|section|
+      section
+    }.join("\n")
+  end
+
+  def sha
+    commit_messages.first[/^(\S*)\s/, 1]
   end
 
   def invalid?
@@ -27,6 +34,9 @@ class CommitDetails
   end
 
   private
+  def commit_messages
+    sections[1..-1]
+  end
 
   def sections
     commit.split("\n")

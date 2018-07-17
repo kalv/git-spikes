@@ -4,10 +4,17 @@ require 'git'
 require 'byebug'
 require 'virtus'
 require './commit_details'
+require './csv_generator'
 
 include DateAndTime::Calculations
 
 GIT_REPOS = './repos'.freeze
+CSV_EXPORTS = './exports'.freeze
+
+## Create directories if they don't exist
+[GIT_REPOS, CSV_EXPORTS].each do |directory|
+  Dir.mkdir(directory) unless File.directory?(directory)
+end
 
 ## Do the stuff
 repo = ARGV[0]
@@ -26,7 +33,7 @@ unless File.directory?(existing_repo)
   Git.clone(repo, name, path: GIT_REPOS)
 end
 
-puts 'analyzing the logs'
+puts 'Analyzing the logs...'
 logs = `cd #{existing_repo} && git log --shortstat --since "JAN 1 2017" --until "DEC 31 2017"`
 commits = logs.split("\n\n").map { |line|
   CommitDetails.new(commit: line)
@@ -34,10 +41,12 @@ commits = logs.split("\n\n").map { |line|
   details.invalid?
 }
 
-puts "done"
+puts 'Generating CSV...'
+file = CsvGenerator.call(
+  output_dir: CSV_EXPORTS,
+  repo: repo,
+  name: name,
+  commits: commits
+)
 
-byebug
-
-puts "why this failing"
-puts 1
-p commits.first
+puts "Done, generated CSV file: #{file}"
