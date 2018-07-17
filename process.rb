@@ -23,7 +23,7 @@ puts "Pulling '#{name}' repo: #{repo}"
 # TODO: handle submodule repos?
 existing_repo = GIT_REPOS + '/' + name
 unless File.directory?(existing_repo)
-  g = Git.clone(repo, name, path: GIT_REPOS)
+  Git.clone(repo, name, path: GIT_REPOS)
 end
 
 puts 'analyzing the logs'

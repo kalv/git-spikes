@@ -32,5 +32,3 @@ class CommitDetails
     commit.split("\n")
   end
 end
-
-

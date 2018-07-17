@@ -13,7 +13,6 @@ describe CommitDetails do
     end
   end
 
-
   it 'should extract the insertions' do
     expect(subject.insertions).to eq '16'
   end
