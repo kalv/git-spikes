@@ -2,16 +2,9 @@ require 'spec_helper'
 require './commit_details'
 
 describe CommitDetails do
-  let(:line) { " 3 files changed, 16 insertions(+), 9 deletions(-)\nb9243ebb8 MOB-4021 Changed Next To Apply on RefundReasonCode Modal (#3087) (Trevor Pries, 7 months ago)" }
-  subject { CommitDetails.new(commit: line) }
-
-  context 'when line is invalid' do
-    let(:line) { '194fe03c7 MOB-4053 Bill Pay Receipt Missing From Email (#3089) (Emad Hilo, 7 months ago)' }
-
-    it 'should be invalid when first line does not include file changed' do
-      expect(subject).to be_invalid
-    end
-  end
+  let(:meta_data) { '3 files changed, 16 insertions(+), 9 deletions(-)' }
+  let(:commits) { ['b9243ebb8 MOB-4021 Changed Next To Apply on RefundReasonCode Modal (#3087) (Trevor Pries, 7 months ago)'] }
+  subject { CommitDetails.new(meta_data: meta_data, commits: commits) }
 
   it 'should extract the sha' do
     expect(subject.sha).to eq 'b9243ebb8'

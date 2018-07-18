@@ -35,10 +35,20 @@ end
 
 puts 'Analyzing the logs...'
 logs = `cd #{existing_repo} && git log --shortstat --since "JAN 1 2017" --until "DEC 31 2017"`
-commits = logs.split("\n\n").map { |line|
-  CommitDetails.new(commit: line)
-}.reject { |details|
-  details.invalid?
+
+commits = []
+current = nil
+logs.split("\n").each { |line|
+  current = CommitDetails.new if current.nil?
+
+  if line[/insertions/]
+    current.meta_data = line
+    commits << current
+    current = nil
+    next
+  end
+
+  current.commits << line
 }
 
 puts 'Generating CSV...'

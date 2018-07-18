@@ -16,7 +16,8 @@ class CsvGenerator
         begin
           csv << csv_row(commit)
         rescue => e
-          byebug
+          puts "Error generating the CSV: #{e}"
+          #byebug
         end
       end
     end
@@ -26,7 +27,7 @@ class CsvGenerator
   private
 
   def headers
-    %w[CommitUrl Delta Insertions Deletions Details, raw]
+    %w[CommitUrl Delta Insertions Deletions Details raw]
   end
 
   def csv_row(commit)
@@ -36,7 +37,7 @@ class CsvGenerator
       commit.insertions,
       commit.deletions,
       commit.details,
-      commit.commit
+      commit.commits.join("\n")
     ]
   end
 
