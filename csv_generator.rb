@@ -37,7 +37,7 @@ class CsvGenerator
       commit.insertions,
       commit.deletions,
       commit.details,
-      commit.commits.join("\n")
+      (commit.commits.push commit.meta_data).join("\n")
     ]
   end
 

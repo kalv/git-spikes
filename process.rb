@@ -36,6 +36,10 @@ end
 puts 'Analyzing the logs...'
 logs = `cd #{existing_repo} && git log --shortstat --since "JAN 1 2017" --until "DEC 31 2017"`
 
+File.open('debug_raw_output.txt', 'w') { |f|
+  f.write logs
+}
+
 commits = []
 current = nil
 logs.split("\n").each { |line|
