@@ -18,7 +18,7 @@ FROM = 'JAN 1 2017'.freeze
 TO   = 'DEC 31 2017'.freeze
 
 # Save time fo debugging to store the log in a txt file
-DEBUG = false
+DEBUG = true
 
 ## Create directories if they don't exist
 [GIT_REPOS, CSV_EXPORTS].each do |directory|
@@ -46,7 +46,7 @@ debug_file = 'debug_raw_output.txt'
 if File.exists?(debug_file)
   logs = File.read(debug_file)
 else
-  logs = `cd #{existing_repo} && git log --numstat --since "#{FROM}" --until "#{TO}"`
+  logs = `cd #{existing_repo} && git log -m --numstat --since "#{FROM}" --until "#{TO}"`
 
   if DEBUG
     File.open(debug_file, 'w') { |f|
@@ -59,7 +59,7 @@ commits = []
 current = nil
 # First line of a block is always the commit log line, with SHA, first sentence message
 logs.split("\n").each { |line|
-  next if line == ""
+  next if line == "" || line[/^-\t-/]
   if current.nil?
     current = NumstatCommit.new(commit: line)
   else
