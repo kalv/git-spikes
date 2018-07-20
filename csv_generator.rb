@@ -7,7 +7,7 @@ class CsvGenerator
   attribute :output_dir, String
   attribute :repo, String
   attribute :name, String
-  attribute :commits, Array[CommitDetails]
+  attribute :commits, Array[NumstatCommit]
 
   def call
     filename = "#{output_dir}/#{name}.csv"

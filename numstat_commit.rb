@@ -1,5 +1,5 @@
 require 'virtus'
-require 'byebug'
+#require 'byebug'
 
 # parsing commit lines that are from a numstat log output
 class NumstatCommit

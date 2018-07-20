@@ -1,9 +1,11 @@
+# Usage: ruby process.rb git-repo-url.git repo-name
+#
+# Will clone the repo and extract the log for the timeline of 2017
 require 'bundler/setup'
 require 'active_support/time'
 require 'git'
-require 'byebug'
+#require 'byebug'
 require 'virtus'
-require './commit_details'
 require './numstat_commit'
 require './csv_generator'
 
@@ -12,12 +14,17 @@ include DateAndTime::Calculations
 GIT_REPOS = './repos'.freeze
 CSV_EXPORTS = './exports'.freeze
 
+FROM = 'JAN 1 2017'.freeze
+TO   = 'DEC 31 2017'.freeze
+
+# Save time fo debugging to store the log in a txt file
+DEBUG = false
+
 ## Create directories if they don't exist
 [GIT_REPOS, CSV_EXPORTS].each do |directory|
   Dir.mkdir(directory) unless File.directory?(directory)
 end
 
-## Do the stuff
 repo = ARGV[0]
 name = ARGV[1]
 
@@ -28,7 +35,7 @@ end
 
 puts "Pulling '#{name}' repo: #{repo}"
 
-# TODO: handle submodule repos?
+# NOTE: handle submodule repos, maybe?
 existing_repo = GIT_REPOS + '/' + name
 unless File.directory?(existing_repo)
   Git.clone(repo, name, path: GIT_REPOS)
@@ -39,22 +46,24 @@ debug_file = 'debug_raw_output.txt'
 if File.exists?(debug_file)
   logs = File.read(debug_file)
 else
-  logs = `cd #{existing_repo} && git log --numstat --since "JAN 1 2017" --until "DEC 31 2017"`
+  logs = `cd #{existing_repo} && git log --numstat --since "#{FROM}" --until "#{TO}"`
 
-  File.open(debug_file, 'w') { |f|
-    f.write logs
-  }
+  if DEBUG
+    File.open(debug_file, 'w') { |f|
+      f.write logs
+    }
+  end
 end
 
 commits = []
 current = nil
+# First line of a block is always the commit log line, with SHA, first sentence message
 logs.split("\n").each { |line|
   next if line == ""
-  puts line
   if current.nil?
     current = NumstatCommit.new(commit: line)
   else
-    unless line[/^\d*\t\d*\t/]
+    unless line[/^\d*\t\d*\t/] # not a numstat line
       commits << current
       current = NumstatCommit.new(commit: line)
     else
