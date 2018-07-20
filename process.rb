@@ -18,7 +18,7 @@ FROM = 'JAN 1 2017'.freeze
 TO   = 'DEC 31 2017'.freeze
 
 # Save time fo debugging to store the log in a txt file
-DEBUG = true
+DEBUG = false
 
 ## Create directories if they don't exist
 [GIT_REPOS, CSV_EXPORTS].each do |directory|
@@ -43,10 +43,10 @@ end
 
 puts 'Analyzing the logs...'
 debug_file = 'debug_raw_output.txt'
-if File.exists?(debug_file)
+if File.exists?(debug_file) && DEBUG
   logs = File.read(debug_file)
 else
-  logs = `cd #{existing_repo} && git log -m --numstat --since "#{FROM}" --until "#{TO}"`
+  logs = `cd #{existing_repo} && git log --no-merges --numstat --since "#{FROM}" --until "#{TO}"`
 
   if DEBUG
     File.open(debug_file, 'w') { |f|

@@ -7,7 +7,7 @@ class NumstatCommit
   attribute :commit, String
   attribute :changes, Array[String], default: []
 
-  IGNORE_FILE_EXTS = 'pdf|jpg|jpeg|gif|png|doc|xls'.freeze
+  IGNORE_FILE_EXTS = 'pdf|jpg|jpeg|gif|png|doc|xls|csv|pdf'.freeze
 
   def insertions
     filtered_changes.map { |change|
