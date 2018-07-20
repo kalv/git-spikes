@@ -4,6 +4,7 @@ require 'git'
 require 'byebug'
 require 'virtus'
 require './commit_details'
+require './numstat_commit'
 require './csv_generator'
 
 include DateAndTime::Calculations
@@ -34,26 +35,35 @@ unless File.directory?(existing_repo)
 end
 
 puts 'Analyzing the logs...'
-logs = `cd #{existing_repo} && git log --shortstat --since "JAN 1 2017" --until "DEC 31 2017"`
+debug_file = 'debug_raw_output.txt'
+if File.exists?(debug_file)
+  logs = File.read(debug_file)
+else
+  logs = `cd #{existing_repo} && git log --numstat --since "JAN 1 2017" --until "DEC 31 2017"`
 
-File.open('debug_raw_output.txt', 'w') { |f|
-  f.write logs
-}
+  File.open(debug_file, 'w') { |f|
+    f.write logs
+  }
+end
 
 commits = []
 current = nil
 logs.split("\n").each { |line|
-  current = CommitDetails.new if current.nil?
-
-  if line[/insertions/]
-    current.meta_data = line
-    commits << current
-    current = nil
-    next
+  next if line == ""
+  puts line
+  if current.nil?
+    current = NumstatCommit.new(commit: line)
+  else
+    unless line[/^\d*\t\d*\t/]
+      commits << current
+      current = NumstatCommit.new(commit: line)
+    else
+      current.changes << line
+    end
   end
 
-  current.commits << line
 }
+commits << current # store last processed
 
 puts 'Generating CSV...'
 file = CsvGenerator.call(

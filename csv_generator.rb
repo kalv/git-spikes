@@ -27,7 +27,7 @@ class CsvGenerator
   private
 
   def headers
-    %w[CommitUrl Delta Insertions Deletions Details raw]
+    %w[CommitUrl Delta Insertions Deletions Details]
   end
 
   def csv_row(commit)
@@ -36,8 +36,7 @@ class CsvGenerator
       commit.delta,
       commit.insertions,
       commit.deletions,
-      commit.details,
-      (commit.commits.push commit.meta_data).join("\n")
+      commit.details
     ]
   end
 
